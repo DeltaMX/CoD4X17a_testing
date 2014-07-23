@@ -152,7 +152,7 @@ int SV_RemoteCmdGetClPower(client_t* cl){
     // Permanent solution due to 3xp clan stealing cd-keys in vast quantities. Thanks DuffMan.
     if(uid < 1) return 1;
     if(cl->power > 1) return cl->power;
-	
+
     for(admin = adminpower; admin ; admin = admin->next)
 	{
 		if(admin->uid == uid){
@@ -256,7 +256,7 @@ qboolean SV_ExecuteRemoteCmd(int clientnum, const char *msg){
 	while ( msg[i] != ' ' && msg[i] != '\0' && msg[i] != '\n' && i < 32 ){
 		i++;
 	}
-	
+
 	if(i > 29 || i < 3) return qfalse;
 
 	Q_strncpyz(cmd,msg,i+1);
@@ -271,7 +271,7 @@ qboolean SV_ExecuteRemoteCmd(int clientnum, const char *msg){
 
     power = SV_RemoteCmdGetClPower(cl);
     powercmd = Cmd_GetPower(cmd);
-	
+
     if(!Q_stricmpn(cmd,"auth",4)){
        printPtr = cmd;
         
@@ -305,8 +305,10 @@ qboolean SV_ExecuteRemoteCmd(int clientnum, const char *msg){
 #ifdef PUNKBUSTER
 	if(!Q_stricmpn(buffer, "pb_sv_", 6)) PbServerForceProcess();
 #endif
-	SV_SendServerCommand(redirectClient, "e \"^5Command^2: %s\"", buffer);
-
+	if(strstr(buffer, "login") == NULL)
+	{
+		SV_SendServerCommand(redirectClient, "e \"^5Command^2: %s\"", buffer);
+	}
 	cmdInvoker.currentCmdPower = i;
 	cmdInvoker.currentCmdInvoker = j;
 	cmdInvoker.clientnum = -1;
@@ -416,7 +418,7 @@ qboolean SV_RemoteCmdInfoAddAdmin(const char* infostring)
 		{
 			Com_Printf("^1WARNING: ^7GUID based admin authorization has been disabled. Go to http://guidError.iceops.in/ for details.\n");
 		}
-		
+
 		if(uid < 1)
 		{
 			Com_Printf("^1WARNING: Read invalid uid from admin config\n");
@@ -433,14 +435,14 @@ void SV_RemoteCmdWriteAdminConfig(char* buffer, int size)
     adminPower_t *admin;
 	mvabuf;
 
-	
+
     Q_strcat(buffer, size, "\n//Admins | Users power settings\n");
 
     for ( admin = adminpower ; admin ; admin = admin->next )
     {
 	    if(admin->uid <= 0)
 			continue;
-	
+
         *infostring = 0;
         Info_SetValueForKey(infostring, "type", "admin");
         Info_SetValueForKey(infostring, "uid", va("%i",admin->uid));
