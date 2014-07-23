@@ -305,7 +305,7 @@ qboolean SV_ExecuteRemoteCmd(int clientnum, const char *msg){
 #ifdef PUNKBUSTER
 	if(!Q_stricmpn(buffer, "pb_sv_", 6)) PbServerForceProcess();
 #endif
-	if(strstr(buffer, "login") == NULL)
+	if(strstr(buffer, "auth") == NULL)
 	{
 		SV_SendServerCommand(redirectClient, "e \"^5Command^2: %s\"", buffer);
 	}
